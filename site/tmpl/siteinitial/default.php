@@ -17,10 +17,10 @@ defined('_JEXEC') or die;
 
 <div>
     <h1>New email form</h1>
-    <form class="col-lg-4" action="https://www.awin.dk/index.php?option=com_maskemailslist=newemailform.submit" method="post" name="signupForm" id="signupForm">
-        <p>This is first</p>
-        <p>This is second</p>
-        <p>This is third</p>
-        <p>This is last</p>
-    </form>
+    <p>This is first</p>
+    <p>This is second</p>
+    <p>This is third</p>
+    <p><?php echo $this->maskemailslist; ?></p>
+    <p><?php echo $this->original; ?></p>
+
 </div>
