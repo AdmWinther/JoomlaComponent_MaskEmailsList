@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<extension type="component" version="4.0" method="upgrade">
+    <name>Mask Emails List</name>
+    <title>Mask Emails List</title>
+    <author>Adam Winther</author>
+    <version>1.1.0</version>
+    <creationDate>2026-01-31</creationDate>
+    <description>A Joomla component for showing list of mask emails</description>
+
+    <namespace path="src/">Thusia\Component\MaskEmailsList</namespace>
+
+    <!-- Backend (admin) files -->
+    <administration>
+        <menu link="index.php?option=com_maskemailslist">Mask Emails List</menu>
+        <files folder="admin/">
+            <folder>services</folder>
+            <folder>src</folder>
+            <folder>tmpl</folder>
+        </files>
+    </administration>
+
+    <!-- Frontend (site) files -->
+    <files folder="site/">
+        <folder>src</folder>
+        <folder>tmpl</folder>
+    </files>
+
+</extension>

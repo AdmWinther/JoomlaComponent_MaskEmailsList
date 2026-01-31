@@ -1,0 +1,9 @@
+<component name="libraryTable">
+  <library name="newemailform">
+    <CLASSES>
+      <root url="jar://$PROJECT_DIR$/newemailform.zip!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>
