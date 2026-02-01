@@ -1,0 +1,7 @@
+<?php
+defined('_JEXEC') or die;
+
+return [
+    'backend_url' => 'http://host.docker.internal:3000',
+    'secretKey' => 'CHANGE_THIS_SECRET_KEY'
+];

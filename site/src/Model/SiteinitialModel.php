@@ -12,30 +12,59 @@ use Joomla\CMS\Log\Log;
 class SiteinitialModel extends BaseDatabaseModel
 {
 
+    private function loadConfig()
+    {
+        $configFile = JPATH_CONFIGURATION . '/components/com_maskemailslist/src/configuration/com_maskemailslistconfiguration.php';
+
+        if (!file_exists($configFile)) {
+            throw new \RuntimeException('Configuration file not found: ' . $configFile);
+        }
+
+        return require $configFile;
+    }
+
     public function getMaskEmailsList() {
+        Log::addLogger(['text_file' => 'maskEmailsListsLogFile.log']);
 
 
         $app = Factory::getApplication();
         $jinput = $app->input;
 
         try {
+            $config = $this->loadConfig();
+
+            $backendUrl = $config['backend_url'];
+
             // 1️⃣ Shared secret – must match backend
-            //$secretKey = 'supersecretkey_you_store_in_env_or_config';
+            $secretKey = $config['secretKey'];
+
+
 
             // Get current user info
             $user = Factory::getUser();
             $username = $user->username;    // The username
 
-            //Get email name from form
+            $payload = [
+                'username' => $username
+            ];
+
+            $jsonPayload = json_encode($payload, JSON_UNESCAPED_SLASHES);
+            Log::add('jsonPayload: ' . $jsonPayload , Log::INFO, 'com_maskemailslist');
+            Log::add('$secretKey: ' . $secretKey , Log::INFO, 'com_maskemailslist');
+            // 3️⃣ Create HMAC signature (hex encoded)
+            $signature = hash_hmac('sha256', $jsonPayload, $secretKey);
 
             $headers = [
                 'Content-Type'  => 'application/json',
+                'X-Signature'   => $signature
             ];
 
+            $requestParam = '?username='.$username;
+            $fullUrl = $backendUrl . $requestParam;
             // 5️⃣ Make HTTP POST to backend
             $http = HttpFactory::getHttp();
             $response = $http->get(
-                'http://host.docker.internal:8080/simulate',  // Your backend endpoint
+                $fullUrl,  // Your backend endpoint
                 $headers
             );
 
@@ -46,7 +75,7 @@ class SiteinitialModel extends BaseDatabaseModel
             if ($response->code >= 200 && $response->code < 300) {
                 $app->enqueueMessage('Backend request succeeded. '. $response->body);
                 Log::add('Backend request succeeded', Log::INFO, 'com_maskemailslist');
-                return("This is my Data 200.");
+                return($response->body);
             } else {
                 $app->enqueueMessage('Backend error: ' . $response->body, 'error');
                 Log::add('Backend request failed with code: ' . $response->code, Log::ERROR, 'com_maskemailslist');
