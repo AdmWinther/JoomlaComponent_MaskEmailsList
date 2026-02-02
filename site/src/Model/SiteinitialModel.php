@@ -28,7 +28,7 @@ class SiteinitialModel extends BaseDatabaseModel
 
 
         $app = Factory::getApplication();
-        $jinput = $app->input;
+        $input = $app->input;
 
         try {
             $config = $this->loadConfig();
@@ -51,6 +51,7 @@ class SiteinitialModel extends BaseDatabaseModel
             $jsonPayload = json_encode($payload, JSON_UNESCAPED_SLASHES);
             Log::add('jsonPayload: ' . $jsonPayload , Log::INFO, 'com_maskemailslist');
             Log::add('$secretKey: ' . $secretKey , Log::INFO, 'com_maskemailslist');
+
             // 3️⃣ Create HMAC signature (hex encoded)
             $signature = hash_hmac('sha256', $jsonPayload, $secretKey);
 
@@ -71,16 +72,39 @@ class SiteinitialModel extends BaseDatabaseModel
             // Log the result
             Log::add('Response: ' . $response->code . ' - ' . $response->body, Log::INFO, 'com_maskemailslist');
 
-            // Optional: Handle success / failure
-            if ($response->code >= 200 && $response->code < 300) {
-                $app->enqueueMessage('Backend request succeeded. '. $response->body);
-                Log::add('Backend request succeeded', Log::INFO, 'com_maskemailslist');
-                return($response->body);
-            } else {
-                $app->enqueueMessage('Backend error: ' . $response->body, 'error');
-                Log::add('Backend request failed with code: ' . $response->code, Log::ERROR, 'com_maskemailslist');
-                return("This is my Data Bad.");
+            // Check if request was successful
+            if ($response->code != 200) {
+                Log::add('API Error: Response code ' . $response->code, Log::ERROR, 'com_maskemailslist');
+                return [];
             }
+
+            // Parse JSON response
+            $jsonData = json_decode($response->body, true);
+
+            if (json_last_error() !== JSON_ERROR_NONE) {
+                Log::add('JSON Parse Error: ' . json_last_error_msg(), Log::ERROR, 'com_maskemailslist');
+                return [];
+            }
+
+            // Extract the data we need
+            $extractedData = [];
+
+            if (isset($jsonData['data']) && is_array($jsonData['data'])) {
+                foreach ($jsonData['data'] as $item) {
+                    $extractedData[] = [
+                        'id' => $item['id'] ?? '',
+                        'name' => $item['attributes']['name'] ?? '',
+                        'mask_email' => $item['attributes']['mask_email'] ?? '',
+                        'account_id_c' => $item['attributes']['account_id_c'] ?? '',
+                        'assignedtoaccount' => $item['attributes']['assignedtoaccount'] ?? ''
+                    ];
+                }
+            }
+
+            Log::add('Extracted ' . count($extractedData) . ' items', Log::INFO, 'com_maskemailslist');
+            Log::add('Extracted data: ' . json_encode($extractedData), Log::DEBUG, 'com_maskemailslist');
+
+            return $extractedData;
 
         } catch (Exception $e) {
             Log::add('Error in submit(): ' . $e->getMessage(), Log::ERROR, 'com_maskemailslist');

@@ -8,25 +8,19 @@ use Joomla\CMS\MVC\View\HtmlView as BaseHtmlView;
 
 class HtmlView extends BaseHtmlView{
 
-    protected $maskemailslist;
-    protected $original;
+    protected $items;
 
     function display($tpl = null)
     {
+        $this->items = $this->get('MaskEmailsList');
 
-        // When you run the following command, Joomla's HtmlView class (which this view extends) has a magic get() method that:
-        //      Takes the string 'MaskEmailsList'
-        //      Prepends 'get' to it → becomes 'getMaskEmailsList'
-        //      Calls $model->getMaskEmailsList() on the model which we already have in SiteinitialModel.php
-        // Alternatively we could go the long way:
-        //      Get the model explicitly
-        //      $model = $this->getModel();
-        //      // Call the method directly
-        //      $this->data = $model->getMaskEmailsList();
-        $this->original = $this->get('MaskEmailsList');
-        $this->maskemailslist = "Kashkakww";
+        // Check for errors (optional)
+        if ($errors = $this->get('Errors')) {
+            foreach ($errors as $error) {
+                \Joomla\CMS\Factory::getApplication()->enqueueMessage($error, 'error');
+            }
+        }
 
-        // Call the parent's display method, the parent is BaseHtmlView which we are extending in this class.
-        parent::display($tpl);
+        return parent::display($tpl);
     }
 }

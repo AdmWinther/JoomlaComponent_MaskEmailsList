@@ -17,7 +17,7 @@ use Joomla\CMS\Log\Log;
  */
 
 /**
- * NewEmailForm Component Controller
+ * MaskEmailsList Component Controller
  * @since  0.0.2
  */
 class DisplayController extends BaseController {
