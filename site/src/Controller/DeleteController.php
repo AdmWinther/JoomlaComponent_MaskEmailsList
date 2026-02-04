@@ -42,9 +42,9 @@ class DeleteController extends BaseController {
     }
 
     public function submit($account_id = null, $maskEmailId = null, $maskEmailAddress = null) {
-        Log::add('Delete Mask email from account_id: ' . $account_id, Log::DEBUG, 'com_maskemailslist');
-        Log::add('Mask Email ID is: ' . $maskEmailId, Log::DEBUG, 'com_maskemailslist');
-        Log::add('and Mask Email Address is: ' . $maskEmailAddress, Log::DEBUG, 'com_maskemailslist');
+        Log::add('Delete Mask email from account_id: ' . $account_id, Log::INFO, 'com_maskemailslist');
+        Log::add('Mask Email ID is: ' . $maskEmailId, Log::INFO, 'com_maskemailslist');
+        Log::add('and Mask Email Address is: ' . $maskEmailAddress, Log::INFO, 'com_maskemailslist');
 
         $app = Factory::getApplication();
         $input = $app->input;
@@ -59,6 +59,7 @@ class DeleteController extends BaseController {
 
             $account_id = $input->getString('account_id');
             $maskEmailId = $input->getString('maskEmailId');
+            $maskEmailAddress = $input->getString('maskEmailAddress');
 
             $payload = [
                 'account_id' => $account_id,
@@ -67,8 +68,8 @@ class DeleteController extends BaseController {
             ];
 
             $jsonPayload = json_encode($payload, JSON_UNESCAPED_SLASHES);
-            Log::add('jsonPayload: ' . $jsonPayload , Log::DEBUG, 'com_maskemailslist');
-            Log::add('$secretKey: ' . $secretKey , Log::DEBUG, 'com_maskemailslist');
+            Log::add('jsonPayload: ' . $jsonPayload , Log::INFO, 'com_maskemailslist');
+            Log::add('$secretKey: ' . $secretKey , Log::INFO, 'com_maskemailslist');
 
             // 3️⃣ Create HMAC signature (hex encoded)
             $signature = hash_hmac('sha256', $jsonPayload, $secretKey);
@@ -80,6 +81,7 @@ class DeleteController extends BaseController {
 
             $requestParam = '?account_id='.$account_id."&maskEmailId=".$maskEmailId."&maskEmailAddress=".$maskEmailAddress;
             $fullUrl = $backendUrl . $requestParam;
+            Log::add('fullUrl for deleting: ' . $fullUrl , Log::INFO, 'com_maskemailslist');
             // 5️⃣ Make HTTP POST to backend
             $http = HttpFactory::getHttp();
             $response = $http->delete(
@@ -88,7 +90,7 @@ class DeleteController extends BaseController {
             );
 
             if ($response->code != 200) {
-                Log::add('API Error: Response code ' . $response->code, Log::ERROR, 'com_maskemailslist');
+                Log::add('API Error: Response code ' . $response->code, Log::INFO, 'com_maskemailslist');
                 $app->redirect('index.php?option=com_maskemailslist&view=siteinitial');
             }
 
@@ -100,7 +102,7 @@ class DeleteController extends BaseController {
 
 
         } catch (Exception $e) {
-            Log::add('Error in Delete.submit(): ' . $e->getMessage(), Log::ERROR, 'com_maskemailslist');
+            Log::add('Error in Delete.submit(): ' . $e->getMessage(), Log::INFO, 'com_maskemailslist');
             $app->enqueueMessage('Error: ' . $e->getMessage(), 'error');
             return("ErrorData.");
         }
