@@ -28,7 +28,7 @@ class DisplayController extends BaseController {
      */
     protected $default_view = 'siteinitial';
     
-    public function display($cachable = false, $urlparams = array()) {
+    public function display($account_id = null, $maskEmailId = null) {
         
         Log::addLogger(['text_file' => 'maskEmailsListsLogFile.log']);
         Log::add('Something happened in Display!', Log::INFO, 'com_maskemailslist');

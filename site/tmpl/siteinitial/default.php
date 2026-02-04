@@ -6,7 +6,7 @@ use Joomla\CMS\Session\Session;
 ?>
 
 <div class="mask-emails-list">
-    <h1><?= Text::_('COM_MASKEMAILSLIST_TITLE') ?></h1>
+    <h1><?= Text::_('Mask Emails List') ?></h1>
 
     <?php if (empty($this->items)): ?>
         <div class="alert alert-info">
@@ -34,6 +34,7 @@ use Joomla\CMS\Session\Session;
                             <form method="post" action="index.php?option=com_maskemailslist&task=delete.submit" style="display:inline;">
                                 <input type="hidden" name="account_id" value="<?= htmlspecialchars($item['account_id_c']) ?>">
                                 <input type="hidden" name="maskEmailId" value="<?= htmlspecialchars($item['id']) ?>">
+                                <input type="hidden" name="maskEmailAddress" value="<?= htmlspecialchars($item['mask_email']) ?>">
                                 <input type="hidden" name="<?= Session::getFormToken() ?>" value="1">
                                 <button
                                     type="submit"

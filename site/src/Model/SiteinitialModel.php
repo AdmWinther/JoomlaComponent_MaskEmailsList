@@ -62,6 +62,8 @@ class SiteinitialModel extends BaseDatabaseModel
 
             $requestParam = '?username='.$username;
             $fullUrl = $backendUrl . $requestParam;
+            Log::add('fullUrl: ' . $fullUrl, Log::INFO, 'com_maskemailslist');
+
             // 5️⃣ Make HTTP POST to backend
             $http = HttpFactory::getHttp();
             $response = $http->get(
@@ -77,7 +79,7 @@ class SiteinitialModel extends BaseDatabaseModel
                 Log::add('API Error: Response code ' . $response->code, Log::ERROR, 'com_maskemailslist');
                 return [];
             }
-
+            Log::add('$response->code: 200', Log::INFO, 'com_maskemailslist');
             // Parse JSON response
             $jsonData = json_decode($response->body, true);
 
